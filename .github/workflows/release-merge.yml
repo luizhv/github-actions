@@ -1,3 +1,5 @@
+name: Release sync
+run-name: Syncing release to dev environments
 on:
   push:
     branches:
@@ -10,11 +12,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Create Pull Request
+        id: open-pr
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: "dev"
           pr_title: "Sync ${{ github.ref_name }} into dev"
           pr_allow_empty: true
-          pr_reviewer: "luizhv"
           pr_body: "**Automated pull request**"
+          pr_assignee: luizhv
+          pr_label: release-sync
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: PR Data
+        run: echo ${{ steps.open-pr.outputs.pr_number }}
+      - name: Merge pull request
+        uses: juliangruber/merge-pull-request-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          method: merge
+          number: ${{ steps.open-pr.outputs.pr_number }}
