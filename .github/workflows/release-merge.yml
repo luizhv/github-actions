@@ -1,3 +1,4 @@
+name: Release sync
 on:
   push:
     branches:
@@ -15,6 +16,5 @@ jobs:
           destination_branch: "dev"
           pr_title: "Sync ${{ github.ref_name }} into dev"
           pr_allow_empty: true
-          pr_reviewer: "luizhv"
           pr_body: "**Automated pull request**"
           github_token: ${{ secrets.GITHUB_TOKEN }}
