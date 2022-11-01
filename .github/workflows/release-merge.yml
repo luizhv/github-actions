@@ -22,8 +22,6 @@ jobs:
           pr_assignee: luizhv
           pr_label: release-sync
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: PR Data
-        run: echo ${{ steps.staging.outputs.pr_number }}
       - name: Enable Auto Merge
         if: ${{ steps.staging.outputs.pr_number }}
         uses: peter-evans/enable-pull-request-automerge@v2
