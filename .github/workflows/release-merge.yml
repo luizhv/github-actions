@@ -11,8 +11,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Create Pull Request
-        id: open-pr
+      - name: Create staging pull request
+        id: staging
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: "staging"
+          pr_title: "Sync ${{ github.ref_name }} into staging"
+          pr_allow_empty: true
+          pr_body: "**Automated pull request**"
+          pr_assignee: luizhv
+          pr_label: release-sync
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: PR Data
+        run: echo ${{ steps.staging.outputs.pr_number }}
+      - name: Enable Auto Merge
+        if: ${{ steps.staging.outputs.pr_number }}
+        uses: peter-evans/enable-pull-request-automerge@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.staging.outputs.pr_number }}
+          merge-method: merge
+      - name: Create dev pull request
+        id: dev
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: "dev"
@@ -23,10 +43,11 @@ jobs:
           pr_label: release-sync
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: PR Data
-        run: echo ${{ steps.open-pr.outputs.pr_number }}
+        run: echo ${{ steps.dev.outputs.pr_number }}
       - name: Enable Auto Merge
-        if: ${{ steps.open-pr.outputs.pr_number }}
+        if: ${{ steps.dev.outputs.pr_number }}
         uses: peter-evans/enable-pull-request-automerge@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          pull-request-number: ${{ steps.open-pr.outputs.pr_number }}
+          pull-request-number: ${{ steps.dev.outputs.pr_number }}
+          merge-method: merge
