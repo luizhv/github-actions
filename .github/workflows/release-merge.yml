@@ -24,10 +24,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: PR Data
         run: echo ${{ steps.open-pr.outputs.pr_number }}
-      - name: Merge pull request
+      - name: Enable Auto Merge
         if: ${{ steps.open-pr.outputs.pr_number }}
-        uses: juliangruber/merge-pull-request-action@v1
+        uses: peter-evans/enable-pull-request-automerge@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          method: merge
-          number: ${{ steps.open-pr.outputs.pr_number }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: steps.open-pr.outputs.pr_number
