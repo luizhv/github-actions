@@ -25,6 +25,7 @@ jobs:
       - name: PR Data
         run: echo ${{ steps.open-pr.outputs.pr_number }}
       - name: Merge pull request
+        if: ${{ steps.open-pr.outputs.pr_number }}
         uses: juliangruber/merge-pull-request-action@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
