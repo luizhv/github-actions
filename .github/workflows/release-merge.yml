@@ -1,4 +1,5 @@
 name: Release sync
+run-name: Syncing release to dev environments
 on:
   push:
     branches:
@@ -17,4 +18,14 @@ jobs:
           pr_title: "Sync ${{ github.ref_name }} into dev"
           pr_allow_empty: true
           pr_body: "**Automated pull request**"
+          pr_assignee: luizhv
+          pr_label: release-sync
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: PR Data
+        run: echo ${{ steps.open-pr.outputs.pr_number }}
+      - name: Merge pull request
+        uses: juliangruber/merge-pull-request-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          method: merge
+          number: ${{ steps.open-pr.outputs.pr_number }}
