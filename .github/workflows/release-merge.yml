@@ -1,32 +1,52 @@
 name: Release sync
-run-name: Syncing release to dev environments
+run-name: Syncing production release to dev environments
 on:
   push:
     branches:
       - main
 
 jobs:
+  sync-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Create staging pull request
+        id: staging
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: "staging"
+          pr_title: "Sync ${{ github.ref_name }} into staging"
+          pr_allow_empty: true
+          pr_body: "**Automated pull request**"
+          pr_label: sync
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Enabling auto merge
+        if: ${{ steps.staging.outputs.pr_number }}
+        uses: peter-evans/enable-pull-request-automerge@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.staging.outputs.pr_number }}
+          merge-method: merge
   sync-dev:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Create Pull Request
-        id: open-pr
+      - name: Create dev pull request
+        id: dev
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: "dev"
           pr_title: "Sync ${{ github.ref_name }} into dev"
           pr_allow_empty: true
           pr_body: "**Automated pull request**"
-          pr_assignee: luizhv
-          pr_label: release-sync
+          pr_label: sync
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: PR Data
-        run: echo ${{ steps.open-pr.outputs.pr_number }}
-      - name: Merge pull request
-        uses: juliangruber/merge-pull-request-action@v1
+      - name: Enabling auto merge
+        if: ${{ steps.dev.outputs.pr_number }}
+        uses: peter-evans/enable-pull-request-automerge@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          method: merge
-          number: ${{ steps.open-pr.outputs.pr_number }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.dev.outputs.pr_number }}
+          merge-method: merge
