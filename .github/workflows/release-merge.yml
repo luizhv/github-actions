@@ -1,5 +1,5 @@
 name: Release sync
-run-name: Syncing release to dev environments
+run-name: Syncing production release to dev environments
 on:
   push:
     branches:
@@ -19,10 +19,9 @@ jobs:
           pr_title: "Sync ${{ github.ref_name }} into staging"
           pr_allow_empty: true
           pr_body: "**Automated pull request**"
-          pr_assignee: luizhv
-          pr_label: release-sync
+          pr_label: sync
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Enable Auto Merge
+      - name: Enabling auto merge
         if: ${{ steps.staging.outputs.pr_number }}
         uses: peter-evans/enable-pull-request-automerge@v2
         with:
@@ -42,10 +41,9 @@ jobs:
           pr_title: "Sync ${{ github.ref_name }} into dev"
           pr_allow_empty: true
           pr_body: "**Automated pull request**"
-          pr_assignee: luizhv
-          pr_label: release-sync
+          pr_label: sync
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Enable Auto Merge
+      - name: Enabling auto merge
         if: ${{ steps.dev.outputs.pr_number }}
         uses: peter-evans/enable-pull-request-automerge@v2
         with:
